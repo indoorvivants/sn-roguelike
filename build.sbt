@@ -2,6 +2,14 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 
 import bindgen.interface.Binding
 
+lazy val parts = project
+  .in(file("."))
+  .aggregate(
+    part1,
+    part2,
+    part3
+  )
+
 lazy val part1 = project
   .in(file("part1"))
   .enablePlugins(ScalaNativePlugin)

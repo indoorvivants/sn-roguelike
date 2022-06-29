@@ -2,7 +2,6 @@ name: CI
 on:
   push:
     branches: ["main"]
-    tags: ["v*"]
   pull_request:
     branches: ["*"]
 
@@ -39,4 +38,4 @@ jobs:
           git submodule update --init && cd raylib/src && make
 
       - name: Compile examples
-        run: sbt nativeLink
+        run: sbt parts/nativeLink
