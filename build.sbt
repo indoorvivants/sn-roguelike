@@ -4,13 +4,19 @@ import bindgen.interface.Binding
 
 lazy val part1 = project
   .in(file("part1"))
-  .enablePlugins(ScalaNativePlugin, BindgenPlugin)
+  .enablePlugins(ScalaNativePlugin)
   .dependsOn(raylib)
   .settings(common)
 
 lazy val part2 = project
   .in(file("part2"))
-  .enablePlugins(ScalaNativePlugin, BindgenPlugin)
+  .enablePlugins(ScalaNativePlugin)
+  .dependsOn(raylib)
+  .settings(common)
+
+lazy val part3 = project
+  .in(file("part3"))
+  .enablePlugins(ScalaNativePlugin)
   .dependsOn(raylib)
   .settings(common)
 
