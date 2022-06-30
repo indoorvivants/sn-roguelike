@@ -40,7 +40,5 @@ jobs:
             sudo apt-get install clang-13 lldb-13 libclang-13-dev llvm-13-dev
           fi
 
-          git submodule update --init && cd raylib/src && make
-
       - name: Compile examples
         run: sbt parts/nativeLink
