@@ -38,7 +38,7 @@ lazy val bindings = project
   .settings(common)
   .enablePlugins(VcpkgPlugin, BindgenPlugin)
   .settings(
-    vcpkgDependencies := Set("raylib", "libtcod"),
+    vcpkgDependencies := Set("raylib"),
     bindgenBindings := {
       Seq(
         Binding(
