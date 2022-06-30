@@ -33,6 +33,13 @@ lazy val part3 = project
   .settings(addRaylib)
   .dependsOn(bindings)
 
+lazy val part4 = project
+  .in(file("part4"))
+  .enablePlugins(ScalaNativePlugin)
+  .settings(common)
+  .settings(addRaylib)
+  .dependsOn(bindings)
+
 lazy val bindings = project
   .in(file(".bindings"))
   .settings(common)
