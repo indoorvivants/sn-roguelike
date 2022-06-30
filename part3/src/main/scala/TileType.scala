@@ -15,8 +15,8 @@ class TileType(using Zone)(using colors: Colors):
   )
 
   val red = Tile(
-    Walkable.No,
+    Walkable.Yes,
     Transparent.No,
-    Graphic(c"*", colors.WHITE, color(150, 0, 0))
+    Graphic(c" ", colors.WHITE, color(150, 0, 0))
   )
 end TileType
