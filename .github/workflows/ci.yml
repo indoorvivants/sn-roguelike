@@ -16,6 +16,22 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Cache SBT
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.sbt
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/*.sbt') }}
+
+      - name: Cache sbt-vcpkg
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/Library/Caches/sbt-vcpkg
+          key: ${{ runner.os }}-sbt-vcpkg-${{ hashFiles('**/build.sbt') }}
+
+
       - uses: actions/setup-java@v2
         with:
           distribution: 'temurin' 
@@ -40,19 +56,4 @@ jobs:
 
       - name: Compile examples
         run: sbt parts/nativeLink
-
-      - name: Cache SBT
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.ivy2/cache
-            ~/.sbt
-          key: ${{ runner.os }}-sbt-${{ hashFiles('**/*.sbt') }}
-
-      - name: Cache sbt-vcpkg
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/Library/Caches/sbt-vcpkg
-          key: ${{ runner.os }}-sbt-vcpkg-${{ hashFiles('**/build.sbt') }}
 
