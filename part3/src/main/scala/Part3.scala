@@ -66,6 +66,8 @@ import scala.scalanative.unsigned.*
         EventHandler.dispatch.foreach(engine.react)
         engine.render
 
+        DrawFPS(10, 10)
+
         EndDrawing()
       end while
     }

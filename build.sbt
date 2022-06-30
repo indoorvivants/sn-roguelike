@@ -1,3 +1,4 @@
+import com.indoorvivants.vcpkg.Platform
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
 import bindgen.interface.Binding
@@ -9,62 +10,75 @@ lazy val parts = project
     part2,
     part3
   )
+  .settings(common)
 
 lazy val part1 = project
   .in(file("part1"))
   .enablePlugins(ScalaNativePlugin)
-  .dependsOn(raylib)
   .settings(common)
+  .settings(addRaylib)
+  .dependsOn(bindings)
 
 lazy val part2 = project
   .in(file("part2"))
   .enablePlugins(ScalaNativePlugin)
-  .dependsOn(raylib)
   .settings(common)
+  .settings(addRaylib)
+  .dependsOn(bindings)
 
 lazy val part3 = project
   .in(file("part3"))
   .enablePlugins(ScalaNativePlugin)
-  .dependsOn(raylib)
   .settings(common)
+  .settings(addRaylib)
+  .dependsOn(bindings)
 
-lazy val raylib =
-  project
-    .in(file(".raylib"))
-    .enablePlugins(ScalaNativePlugin, BindgenPlugin)
-    .settings(common)
-    .settings(
-      bindgenBindings := {
-        val base = (ThisBuild / baseDirectory).value
-        Seq(
-          Binding(
-            base / "raylib" / "src" / "raylib.h",
-            "raylib",
-            cImports = List("raylib.h")
-          )
+lazy val bindings = project
+  .in(file(".bindings"))
+  .settings(common)
+  .enablePlugins(VcpkgPlugin, BindgenPlugin)
+  .settings(
+    vcpkgDependencies := Set("raylib"),
+    bindgenBindings := {
+      Seq(
+        Binding(
+          vcpkgManager.value.includes("raylib") / "raylib.h",
+          "raylib",
+          cImports = List("raylib.h")
         )
-      }
-    )
+      )
+    }
+  )
+
 
 // common settings
 
 val common = Seq(
-  scalaVersion := "3.1.3",
-  nativeConfig := {
-    val base = (ThisBuild / baseDirectory).value
-    val conf = nativeConfig.value
-    val staticLib = base / "raylib" / "src" / "libraylib.a"
-    val include = base / "raylib" / "src"
+  scalaVersion := "3.1.3"
+)
 
-    val extras =
-      "-framework CoreVideo -framework IOKit -framework Cocoa -framework GLUT -framework OpenGL"
-        .split(" ")
-        .toList
+val addRaylib = Seq(
+  nativeConfig := {
+    val conf = nativeConfig.value
+
+    val pkgConfig = (bindings / vcpkgConfigurator).value
+
+    val platformSpecific = Seq(
+      "-framework",
+      "CoreVideo",
+      "-framework",
+      "GLUT",
+      "-framework",
+      "OpenGL"
+    )
+
+    val compilation = pkgConfig.compilationFlags("raylib")
+    val linking = pkgConfig.linkingFlags("raylib")
 
     conf
       .withLinkingOptions(
-        conf.linkingOptions ++ List(staticLib.toString) ++ extras
+        conf.linkingOptions ++ linking ++ platformSpecific
       )
-      .withCompileOptions(conf.compileOptions ++ List(s"-I$include") ++ extras)
+      .withCompileOptions(conf.compileOptions ++ compilation)
   }
 )
