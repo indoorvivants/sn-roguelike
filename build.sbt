@@ -62,7 +62,8 @@ lazy val bindings = project
 
 val common = Seq(
   scalaVersion := "3.1.3",
-  libraryDependencies += "com.outr" %%% "scribe" % "3.10.0"
+  libraryDependencies += "com.outr" %%% "scribe" % "3.10.0",
+  resolvers += Resolver.sonatypeRepo("snapshots")
 )
 
 val addRaylib = Seq(
