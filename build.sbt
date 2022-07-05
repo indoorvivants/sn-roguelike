@@ -8,7 +8,8 @@ lazy val parts = project
   .aggregate(
     part1,
     part2,
-    part3
+    part3,
+    part4
   )
   .settings(common)
 
@@ -33,6 +34,13 @@ lazy val part3 = project
   .settings(addRaylib)
   .dependsOn(bindings)
 
+lazy val part4 = project
+  .in(file("part4"))
+  .enablePlugins(ScalaNativePlugin)
+  .settings(common)
+  .settings(addRaylib)
+  .dependsOn(bindings)
+
 lazy val bindings = project
   .in(file(".bindings"))
   .settings(common)
@@ -50,11 +58,12 @@ lazy val bindings = project
     }
   )
 
-
 // common settings
 
 val common = Seq(
-  scalaVersion := "3.1.3"
+  scalaVersion := "3.1.3",
+  libraryDependencies += "com.outr" %%% "scribe" % "3.10.0",
+  resolvers += Resolver.sonatypeRepo("snapshots")
 )
 
 val addRaylib = Seq(
