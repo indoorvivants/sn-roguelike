@@ -1,121 +1,117 @@
 package roguelike
 
 import scalanative.unsafe.*
-import raylib.types.*
+import raylib.types.{Color}
 import raylib.functions.*
+import roguelike.MatrixLike.Offset
+import scala.collection.immutable.BitSet.BitSet1
 
 case class Graphic(ch: CString, fg: Color, bg: Color)
-case class Tile(walkable: Walkable, transparent: Transparent, dark: Graphic)
+case class Tile(
+    walkable: Walkable,
+    transparent: Transparent,
+    dark: Graphic,
+    light: Graphic
+)
 
 object Tile:
-  given drawTile(using rc: RenderConfig): Drawable[Tile] with
-    def draw(tile: Tile, pos: Position) =
-      DrawRectangle(
-        pos.pixelX.value,
-        pos.pixelY.value,
-        rc.tileSize,
-        rc.tileSize,
-        stackPtr(tile.dark.bg)
-      )
-      DrawText(
-        tile.dark.ch,
-        pos.pixelX.value,
-        pos.pixelY.value,
-        rc.tileSize,
-        stackPtr(tile.dark.fg)
-      )
-    end draw
-  end drawTile
+  def draw(tile: Tile, pos: Position, graphic: Graphic)(using
+      rc: RenderConfig
+  ) =
+    DrawRectangle(
+      pos.pixelX.value,
+      pos.pixelY.value,
+      rc.tileSize,
+      rc.tileSize,
+      stackPtr(graphic.bg)
+    )
+    DrawText(
+      tile.dark.ch,
+      pos.pixelX.value,
+      pos.pixelY.value,
+      rc.tileSize,
+      stackPtr(graphic.fg)
+    )
+  end draw
 end Tile
 
-opaque type Walkable = Boolean
-object Walkable extends YesNo[Walkable]
+case class GameMap private (
+    tiles: TileMatrix,
+    visible: Mask[Visible],
+    explored: Mask[Explored]
+)(using tileTypes: TileType):
+  val width = tiles.width
+  val height = tiles.height
 
-opaque type Transparent = Boolean
-object Transparent extends YesNo[Transparent]
+  inline def foreachPosition(inline f: Position => Unit) =
+    var x = 0
+    var y = 0
+    while x < width.value do
+      y = 0
+      while y < height.value do
+        f(Position(X(x), Y(y)))
+        y += 1
+      x += 1
+  end foreachPosition
 
-class TileMatrix private (
-    private val tiles: Array[Tile],
-    private val positions: Array[Position],
-    width: X,
-    height: Y
-):
-
-  import TileMatrix.*
-  private inline def offset(x: X, y: Y) = Offset(
-    y.value * width.value + x.value
-  )
-
-  inline def at(x: X, y: Y) =
-    tiles(offset(x, y).value)
-
-  inline def positionAt(x: X, y: Y) =
-    positions(offset(x, y).value)
-
-  inline def set(x: X, y: Y, tile: Tile) =
-    tiles.update(offset(x, y).value, tile)
-
-  inline def inBounds(x: X, y: Y) =
-    x.value >= 0 && x.value < width.value &&
-      y.value >= 0 && y.value < height.value
-
-end TileMatrix
-
-object TileMatrix:
-  private[TileMatrix] opaque type Offset = Int
-  private[TileMatrix] object Offset extends OpaqueNum[Offset]
-
-  def create(width: X, height: Y, tile: Tile) =
-    val size = width.value * height.value
-    val arr = Array.fill(size)(tile)
-    // pre-calculate positions
-    val positions = Array.fill(size)(Position(X(0), Y(0)))
-    for
-      x <- 0 until width.value
-      y <- 0 until height.value
-    do positions.update(y * width.value + x, Position(X(x), Y(y)))
-
-    new TileMatrix(arr, positions, width, height)
-  end create
-end TileMatrix
-
-case class GameMap private (tiles: TileMatrix, width: X, height: Y):
   inline def draw(using rc: RenderConfig) =
-    for
-      x <- 0 until width.value
-      y <- 0 until height.value
-    do
-      val tile = tiles.at(X(x), Y(y))
-      val pos = tiles.positionAt(X(x), Y(y))
-      summon[Drawable[Tile]].draw(tile, pos)
+    foreachPosition { pos =>
+      val tile = tiles.at(pos)
+      if isVisible(pos) then Tile.draw(tile, pos, tile.light)
+      else if isExplored(pos) then Tile.draw(tile, pos, tile.dark)
+      else Tile.draw(tileTypes.shroud, pos, tileTypes.shroud.dark)
+    }
 
-  inline def updateTile(x: X, y: Y, tile: Tile): GameMap =
-    tiles.set(x, y, tile)
+  inline def updateTile(pos: Position, tile: Tile): GameMap =
+    tiles.set(pos, tile)
     this
 
-  inline def isWalkable(x: X, y: Y) =
-    tiles.inBounds(x, y) && tiles.at(x, y).walkable == Walkable.Yes
+  inline def isVisible(pos: Position) = visible.at(pos) == Visible.Yes
+  inline def isExplored(pos: Position) = explored.at(pos) == Explored.Yes
 
-  inline def carveOut(room: RectangularRoom, tile: Tile): GameMap =
+  inline def isTransparent(pos: Position) =
+    tiles.at(pos).transparent == Transparent.Yes
+
+  inline def setVisible(pos: Position): Unit =
+    visible.set(pos, Visible.Yes)
+
+  inline def setHidden(pos: Position): Unit =
+    visible.set(pos, Visible.No)
+
+  inline def setExplored(pos: Position) =
+    explored.set(pos, Explored.Yes)
+
+  inline def setVisiblePoints(pi: PointIterator) =
+    foreachPosition(setHidden(_))
+    pi.forEachPoint(setVisible(_))
+
+  inline def isWalkable(pos: Position) =
+    tiles.inBounds(pos)
+      && tiles.at(pos).walkable == Walkable.Yes
+
+  inline def carveOut(room: Rectangle, tile: Tile): GameMap =
     for
       offsetX <- 0 until room.width.value
       offsetY <- 0 until room.height.value
     do
       tiles.set(
-        room.x.map(_ + offsetX),
-        room.y.map(_ + offsetY),
+        Position(room.x.map(_ + offsetX), room.y.map(_ + offsetY)),
         tile
       )
     this
   end carveOut
 
   inline def carveOut(tunnel: Tunnel, tile: Tile) =
-    tunnel.foreachPoint { pos =>
-      tiles.set(pos.x, pos.y, tile)
+    tunnel.points.forEachPoint { pos =>
+      tiles.set(pos, tile)
     }
+
+  inline def inBounds(pos: Position) = tiles.inBounds(pos)
 
 end GameMap
 
 object GameMap:
-  def create(width: X, height: Y, tile: Tile) =
-    new GameMap(TileMatrix.create(width, height, tile), width, height)
+  def create(width: X, height: Y, tile: Tile)(using Zone, TileType) =
+    val visible = Mask.create(width, height, Visible)
+    val explored = Mask.create(width, height, Explored)
+    new GameMap(TileMatrix.create(width, height, tile), visible, explored)

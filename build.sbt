@@ -8,7 +8,8 @@ lazy val parts = project
   .aggregate(
     part1,
     part2,
-    part3
+    part3,
+    part4
   )
   .settings(common)
 
@@ -57,11 +58,11 @@ lazy val bindings = project
     }
   )
 
-
 // common settings
 
 val common = Seq(
-  scalaVersion := "3.1.3"
+  scalaVersion := "3.1.3",
+  libraryDependencies += "com.outr" %%% "scribe" % "3.10.0"
 )
 
 val addRaylib = Seq(

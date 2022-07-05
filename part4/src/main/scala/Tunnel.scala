@@ -5,10 +5,12 @@ trait Random:
   def int(from: Int, to: Int): Int
 
 case class Tunnel(lines: Vector[Line]):
-  inline def foreachPoint(inline f: Position => Unit) =
+  val points = PointIterator.cached { f =>
     lines.foreach { line =>
-      line.forEachPoint(f)
+      line.points.forEachPoint(f)
     }
+
+  }
 
 object Tunnel:
   def L_shaped(from: Position, to: Position)(using rand: Random) =

@@ -1,7 +1,7 @@
 package roguelike
 
 case class GeneratedRooms(
-    rooms: Vector[RectangularRoom],
+    rooms: Vector[Rectangle],
     playerLocation: Position,
     tunnels: Vector[Tunnel]
 )
@@ -10,7 +10,7 @@ object RoomGenerator:
   def generate(maxRooms: Int, min_size: Cells, max_size: Cells, game: GameMap)(
       using rand: Random
   ): GeneratedRooms =
-    val rooms = Vector.newBuilder[RectangularRoom]
+    val rooms = Vector.newBuilder[Rectangle]
     var loc = Position(X(0), Y(0))
 
     (0 to maxRooms).foreach { _ =>
@@ -20,7 +20,7 @@ object RoomGenerator:
       val x = X(rand.int(0, game.width.value - roomWidth - 1))
       val y = Y(rand.int(0, game.height.value - roomHeight - 1))
 
-      val room = RectangularRoom(x, y, X(roomWidth), Y(roomHeight))
+      val room = Rectangle(x, y, X(roomWidth), Y(roomHeight))
 
       val intersects = rooms.result().exists(_.intersects(room))
 
