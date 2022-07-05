@@ -18,3 +18,5 @@ Parts completed:
 
 - [x] Part 1 `sbt part1/run`
 - [x] Part 2 `sbt part2/run`
+- [x] Part 3 `sbt part3/run`
+- [x] Part 4 `sbt part4/run`
