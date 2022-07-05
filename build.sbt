@@ -1,3 +1,4 @@
+import scala.scalanative.build.Mode
 import com.indoorvivants.vcpkg.Platform
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
@@ -8,7 +9,8 @@ lazy val parts = project
   .aggregate(
     part1,
     part2,
-    part3
+    part3,
+    part4
   )
   .settings(common)
 
@@ -28,6 +30,13 @@ lazy val part2 = project
 
 lazy val part3 = project
   .in(file("part3"))
+  .enablePlugins(ScalaNativePlugin)
+  .settings(common)
+  .settings(addRaylib)
+  .dependsOn(bindings)
+
+lazy val part4 = project
+  .in(file("part4"))
   .enablePlugins(ScalaNativePlugin)
   .settings(common)
   .settings(addRaylib)
@@ -54,7 +63,8 @@ lazy val bindings = project
 // common settings
 
 val common = Seq(
-  scalaVersion := "3.1.3"
+  scalaVersion := "3.1.3",
+  libraryDependencies += "com.outr" %%% "scribe" % "3.10.0"
 )
 
 val addRaylib = Seq(
@@ -80,5 +90,6 @@ val addRaylib = Seq(
         conf.linkingOptions ++ linking ++ platformSpecific
       )
       .withCompileOptions(conf.compileOptions ++ compilation)
+      .withOptimize(false)
   }
 )
