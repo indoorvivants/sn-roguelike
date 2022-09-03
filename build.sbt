@@ -48,6 +48,7 @@ lazy val bindings = project
   .settings(
     vcpkgDependencies := Set("raylib"),
     bindgenBindings := {
+      vcpkgInstall.value
       Seq(
         Binding(
           vcpkgManager.value.includes("raylib") / "raylib.h",
@@ -61,7 +62,7 @@ lazy val bindings = project
 // common settings
 
 val common = Seq(
-  scalaVersion := "3.1.3",
+  scalaVersion := "3.2.0",
   libraryDependencies += "com.outr" %%% "scribe" % "3.10.0",
   resolvers += Resolver.sonatypeRepo("snapshots")
 )
