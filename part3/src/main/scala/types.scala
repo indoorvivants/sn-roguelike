@@ -21,5 +21,5 @@ object PixelY extends OpaqueNum[PixelY]
 opaque type Probability = Double
 object Probability extends TotalWrapper[Probability, Double]
 
-opaque type Cells = Int 
+opaque type Cells = Int
 object Cells extends OpaqueNum[Cells]
