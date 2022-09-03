@@ -61,7 +61,7 @@ lazy val bindings = project
 // common settings
 
 val common = Seq(
-  scalaVersion := "3.1.3",
+  scalaVersion := "3.2.0",
   libraryDependencies += "com.outr" %%% "scribe" % "3.10.0",
   resolvers += Resolver.sonatypeRepo("snapshots")
 )
@@ -71,6 +71,7 @@ val addRaylib = Seq(
     val conf = nativeConfig.value
 
     val pkgConfig = (bindings / vcpkgConfigurator).value
+    val _ = (bindings / vcpkgInstall).value
 
     val platformSpecific = Seq(
       "-framework",
