@@ -48,6 +48,7 @@ lazy val bindings = project
   .settings(
     vcpkgDependencies := Set("raylib"),
     bindgenBindings := {
+      vcpkgInstall.value
       Seq(
         Binding(
           vcpkgManager.value.includes("raylib") / "raylib.h",
@@ -71,7 +72,6 @@ val addRaylib = Seq(
     val conf = nativeConfig.value
 
     val pkgConfig = (bindings / vcpkgConfigurator).value
-    val _ = (bindings / vcpkgInstall).value
 
     val platformSpecific = Seq(
       "-framework",
