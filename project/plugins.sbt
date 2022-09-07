@@ -2,7 +2,7 @@
 // a version that has "SNAPSHOT" in it
 resolvers += Resolver.sonatypeRepo("snapshots")
 addSbtPlugin(
-  "com.indoorvivants" % "bindgen-sbt-plugin" % "0.0.13+20-4fe7511c-SNAPSHOT"
+  "com.indoorvivants" % "bindgen-sbt-plugin" % "0.0.13+21-8c00bb3f-SNAPSHOT"
 )
 addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.4.7")
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.6")
