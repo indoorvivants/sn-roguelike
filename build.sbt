@@ -1,4 +1,3 @@
-import com.indoorvivants.vcpkg.Platform
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
 import bindgen.interface.Binding
