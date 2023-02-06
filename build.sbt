@@ -80,13 +80,14 @@ val addRaylib = Seq(
       "OpenGL"
     )
 
-    val compilation = pkgConfig.compilationFlags("raylib")
-    val linking = pkgConfig.linkingFlags("raylib")
+    val compilation =
+      pkgConfig.updateCompilationFlags(conf.compileOptions, "raylib")
+    val linking = pkgConfig.updateLinkingFlags(conf.linkingOptions, "raylib")
 
     conf
       .withLinkingOptions(
-        conf.linkingOptions ++ linking ++ platformSpecific
+        linking ++ platformSpecific
       )
-      .withCompileOptions(compilation ++ conf.compileOptions)
+      .withCompileOptions(compilation)
   }
 )
