@@ -45,14 +45,16 @@ lazy val bindings = project
   .settings(common)
   .enablePlugins(VcpkgPlugin, BindgenPlugin)
   .settings(
-    vcpkgDependencies := Set("raylib"),
+    vcpkgDependencies := VcpkgDependencies("raylib"),
     bindgenBindings := {
       Seq(
-        Binding(
-          vcpkgConfigurator.value.includes("raylib") / "raylib.h",
-          "raylib",
-          cImports = List("raylib.h")
-        )
+        Binding
+          .builder(
+            vcpkgConfigurator.value.includes("raylib") / "raylib.h",
+            "raylib"
+          )
+          .addCImport("raylib.h")
+          .build
       )
     }
   )
