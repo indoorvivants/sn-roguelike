@@ -6,4 +6,4 @@ addSbtPlugin(
 )
 addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.4.10")
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.0")
-addSbtPlugin("com.indoorvivants.vcpkg" % "sbt-vcpkg" % "0.0.11")
+addSbtPlugin("com.indoorvivants.vcpkg" % "sbt-vcpkg-native" % "0.0.11")
