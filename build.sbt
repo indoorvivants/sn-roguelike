@@ -63,7 +63,7 @@ lazy val bindings = project
 
 val common = Seq(
   scalaVersion := "3.2.2",
-  libraryDependencies += "com.outr" %%% "scribe" % "3.11.1",
+  libraryDependencies += "com.outr" %%% "scribe" % "3.11.3",
   resolvers += Resolver.sonatypeRepo("snapshots")
 )
 
