@@ -1,7 +1,7 @@
 package roguelike
 
 import scalanative.unsafe.*
-import raylib.types.{Color}
+import raylib.types.Color
 import raylib.functions.*
 import roguelike.MatrixLike.Offset
 import scala.collection.immutable.BitSet.BitSet1

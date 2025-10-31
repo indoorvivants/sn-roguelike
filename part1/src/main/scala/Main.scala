@@ -17,7 +17,6 @@ import scala.scalanative.unsigned.*
   )
 
   Zone { implicit z =>
-
     val WHITE = Color(255.toUByte, 255.toUByte, 255.toUByte, 255.toUByte)
     val GREEN = Color(0.toUByte, 255.toUByte, 0.toUByte, 255.toUByte)
     val BLUE = Color(0.toUByte, 0.toUByte, 255.toUByte, 255.toUByte)
