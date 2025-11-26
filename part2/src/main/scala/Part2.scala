@@ -46,7 +46,6 @@ import scala.scalanative.unsigned.*
       player,
       game
     ) { engine =>
-
       while !WindowShouldClose() do
         BeginDrawing()
         ClearBackground(BLACK)
